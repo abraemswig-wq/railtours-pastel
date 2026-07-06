@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAIL TOURS — Bahnreisen mit Weitblick</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F7F4EE; --paper-2:#FBF9F5;
+  --ink:#26303A; --text:#3D4753; --muted:#7C8794; --line:#E6E0D6;
+  --accent:#7FB0CE; --accent-deep:#5E8FAF;
+  --sky:#CFE4EF; --blush:#F3DBD5; --sage:#D3E0CC; --butter:#F3E7C4; --lav:#DED9EC;
+  --footer:#3A4652; --footer-soft:#46535F; --white:#fff;
+  --sl:2px; /* underline thickness */
+  --ease:cubic-bezier(.22,.61,.36,1);
+  --ease-out:cubic-bezier(.16,1,.3,1);
+  --maxw:1280px; --pad:clamp(20px,5vw,72px);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:auto}
+body{
+  font-family:'Inter',system-ui,sans-serif;background:var(--paper);color:var(--ink);
+  -webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
+  font-size:16px;line-height:1.6;letter-spacing:-.01em;overflow-x:hidden;
+}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:var(--maxw);margin:0 auto;padding-inline:var(--pad)}
+
+/* ---------- scroll progress ---------- */
+#progress{position:fixed;top:0;left:0;height:3px;width:0;background:var(--accent);z-index:200;transition:width .1s linear}
+
+/* ---------- underline-on-hover links (from ref hoverRules) ---------- */
+.ul{
+  background-image:linear-gradient(currentColor,currentColor);
+  background-size:0% var(--sl);background-repeat:no-repeat;background-position:right bottom;
+  transition:background-size .3s var(--ease);padding-bottom:2px;
+}
+@media(hover:hover) and (pointer:fine){ .ul:hover{background-size:100% var(--sl);background-position:left bottom} }
+
+/* ---------- top nav ---------- */
+header{position:fixed;top:0;left:0;right:0;z-index:100;
+  transition:background .4s var(--ease),padding .4s var(--ease),box-shadow .4s var(--ease),
+    opacity .8s var(--ease-out),transform .8s var(--ease-out)}
+/* legibility scrim behind nav while transparent over bright hero photos */
+header::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,rgba(20,28,34,.42),transparent);opacity:1;transition:opacity .4s var(--ease)}
+header.solid::before{opacity:0}
+header .bar{position:relative;z-index:1}
+header:not(.solid) .logo,header:not(.solid) nav.top a{text-shadow:0 1px 10px rgba(15,22,28,.45)}
+header .bar{display:flex;align-items:center;justify-content:space-between;
+  max-width:var(--maxw);margin:0 auto;padding:22px var(--pad)}
+.logo{font-weight:800;font-size:20px;letter-spacing:-.02em;display:inline-flex;align-items:center;gap:.55em;color:var(--white)}
+.logo .mark{width:22px;height:22px;flex:0 0 auto}
+.logo .dot{color:var(--accent)}
+nav.top a{color:rgba(255,255,255,.9);font-size:14px;font-weight:500;margin-left:34px;letter-spacing:0}
+header.solid{background:var(--paper);box-shadow:0 1px 0 var(--line)}
+header.solid .logo,header.solid nav.top a{color:var(--ink)}
+header.solid .logo .dot{color:var(--accent-deep)}
+.nav-cta{border:1px solid rgba(255,255,255,.5);border-radius:100px;padding:9px 18px !important;
+  transition:background .3s var(--ease),color .3s var(--ease),border-color .3s var(--ease)}
+@media(hover:hover){.nav-cta:hover{background:var(--white);color:var(--ink) !important;border-color:var(--white)}}
+header.solid .nav-cta{border-color:var(--line)}
+header.solid .nav-cta:hover{background:var(--ink);color:var(--white) !important;border-color:var(--ink)}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;gap:.6em;font-weight:600;font-size:15px;
+  border-radius:100px;padding:15px 26px;cursor:pointer;border:1px solid transparent;
+  transition:background .35s var(--ease),color .35s var(--ease),border-color .35s var(--ease),transform .35s var(--ease)}
+.btn svg{width:16px;height:16px}
+.btn-primary{background:var(--ink);color:var(--white)}
+.btn-primary:hover{background:var(--accent-deep)}
+.btn-ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn-ghost:hover{background:var(--ink);color:var(--white);border-color:var(--ink)}
+.btn-light{background:var(--white);color:var(--ink)}
+.btn-light:hover{background:var(--accent);color:var(--white)}
+
+/* circular arrow link (News "Read All") */
+.arrowlink{display:inline-flex;align-items:center;gap:12px;font-size:15px;font-weight:500}
+.arrowlink .circ{width:30px;height:30px;border-radius:50%;background:var(--ink);color:#fff;
+  display:grid;place-items:center;transition:transform .35s var(--ease),background .35s var(--ease)}
+.arrowlink .circ svg{width:14px;height:14px}
+@media(hover:hover){.arrowlink:hover .circ{background:var(--accent-deep);transform:translateX(4px)}}
+
+/* ---------- pastel photo placeholders (scenic rail landscapes) ---------- */
+.photo{position:relative;overflow:hidden;border-radius:14px;background:var(--sky);isolation:isolate}
+.photo .media{position:absolute;inset:0;transition:transform 1s var(--ease-out)}
+.photo::after{content:"";position:absolute;inset:0;z-index:2;
+  background:linear-gradient(transparent 55%,rgba(38,48,58,.10))}
+/* the "media" gets a layered sky + hills via gradients per scene */
+.sc-sky   .media{background:
+  radial-gradient(120% 80% at 70% 12%,#F6EFE0 0%,transparent 55%),
+  linear-gradient(180deg,#CFE4EF 0%,#DCEBEF 38%,#E7EBDD 60%,#CBD9BE 100%)}
+.sc-dawn  .media{background:
+  radial-gradient(90% 70% at 78% 18%,#F7E4D4 0%,transparent 60%),
+  linear-gradient(180deg,#F3DBD5 0%,#E9D6D9 40%,#D8D9DE 66%,#C7CFC5 100%)}
+.sc-alpine .media{background:
+  radial-gradient(100% 70% at 30% 15%,#EAF2F6 0%,transparent 55%),
+  linear-gradient(180deg,#BCD6E4 0%,#CFDCDE 45%,#DDE0CF 70%,#B9C7AA 100%)}
+.sc-meadow .media{background:
+  radial-gradient(110% 80% at 60% 20%,#F6F0DC 0%,transparent 55%),
+  linear-gradient(180deg,#D6E7C9 0%,#DFE9CE 40%,#E9E6C7 70%,#CBD8A9 100%)}
+.sc-dusk  .media{background:
+  radial-gradient(90% 70% at 25% 22%,#F4E1CE 0%,transparent 58%),
+  linear-gradient(180deg,#DED9EC 0%,#E7DBE0 42%,#EBD9CE 70%,#CFC6C0 100%)}
+.sc-lake  .media{background:
+  radial-gradient(120% 70% at 72% 14%,#F2ECDC 0%,transparent 55%),
+  linear-gradient(180deg,#CDE3EE 0%,#D5E3E6 40%,#BFD6DE 55%,#A9C6D2 100%)}
+/* subtle mountain silhouette layer */
+.photo .media::before{content:"";position:absolute;left:-5%;right:-5%;bottom:0;height:46%;
+  background:
+    radial-gradient(60% 120% at 18% 100%,rgba(90,110,110,.28) 0 40%,transparent 42%),
+    radial-gradient(50% 120% at 46% 100%,rgba(70,95,100,.22) 0 42%,transparent 44%),
+    radial-gradient(70% 120% at 82% 100%,rgba(95,115,110,.20) 0 40%,transparent 42%);
+  -webkit-mask-image:linear-gradient(180deg,transparent,#000 30%);mask-image:linear-gradient(180deg,transparent,#000 30%)}
+/* thin train/track line motif */
+.photo .media::after{content:"";position:absolute;left:0;right:0;bottom:14%;height:2px;
+  background:linear-gradient(90deg,transparent,rgba(38,48,58,.25) 20%,rgba(38,48,58,.25) 80%,transparent);
+  transform:skewY(-2deg)}
+@media(hover:hover){.card:hover .media,.zoomph:hover .media{transform:scale(1.08)}}
+/* real photos: cover the frame, drop the decorative gradient motifs */
+.photo.real .media{background-size:cover !important;background-position:center;background-repeat:no-repeat}
+.photo.real .media::before,.photo.real .media::after{display:none}
+.photo.real::after{background:linear-gradient(transparent 62%,rgba(38,48,58,.16))}
+
+/* generic section rhythm */
+section{position:relative}
+.pad-xl{padding-block:clamp(90px,13vh,170px)}
+.pad-l{padding-block:clamp(70px,10vh,130px)}
+.eyebrow{font-size:13px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--accent-deep)}
+h2.big{font-size:clamp(28px,4.4vw,58px);font-weight:700;line-height:1.05;letter-spacing:-.03em}
+h3.mid{font-size:clamp(22px,2.6vw,34px);font-weight:600;line-height:1.12;letter-spacing:-.02em}
+.lead{color:var(--text);max-width:52ch}
+.small{font-size:14.5px;color:var(--muted);line-height:1.7}
+.center{text-align:center}
+.tint-sky{background:linear-gradient(180deg,var(--paper),#EAF1F4 60%,var(--paper))}
+.tint-blush{background:linear-gradient(180deg,var(--paper),#FBEDE9 60%,var(--paper))}
+.tint-sage{background:linear-gradient(180deg,var(--paper),#EDF2E6 60%,var(--paper))}
+
+/* ---------- reveal ---------- */
+.rv{opacity:0;transform:translateY(26px);transition:opacity .9s var(--ease-out),transform .9s var(--ease-out)}
+.rv.in{opacity:1;transform:none}
+.rv-d1{transition-delay:.08s}.rv-d2{transition-delay:.16s}.rv-d3{transition-delay:.24s}.rv-d4{transition-delay:.32s}
+/* clip-path wipe for big headings (from ref: clip-path 1s/1.5s transitions) */
+.wipe{clip-path:inset(0 100% 0 0);transition:clip-path 1.2s var(--ease-out)}
+.wipe.in{clip-path:inset(0 0 0 0)}
+/* word-by-word statement */
+.words span{display:inline-block;opacity:0;transform:translateY(.5em);
+  transition:opacity .6s var(--ease-out),transform .6s var(--ease-out)}
+.words.in span{opacity:1;transform:none}
+
+/* ---------- HERO ---------- */
+.hero{position:relative;height:100vh;min-height:640px;overflow:hidden;background:#20303a}
+/* .hero-stage = the visual block that zooms from a rounded inset up to full-bleed during the intro */
+.hero .hero-stage{position:absolute;inset:0;z-index:0;overflow:hidden;transform-origin:50% 50%;
+  will-change:transform;backface-visibility:hidden}
+.hero video.bgvid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
+/* .bg = parallax layer (scroll-driven transform only) */
+.hero .bg{position:absolute;inset:-10% 0 0 0;z-index:0;will-change:transform}
+/* .kb = ken-burns layer (continuous scale drift — separate element so it never fights the parallax transform) */
+.hero .kb{position:absolute;inset:0;background-image:url(assets/hero-bg.jpg);background-size:cover;background-position:center 40%;
+  animation:heroDrift 30s ease-in-out infinite alternate;will-change:transform}
+@keyframes heroDrift{0%{transform:scale(1.06)}100%{transform:scale(1.14) translateY(-1.5%)}}
+/* drifting light layer to read like moving footage */
+.hero .clouds{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.35;mix-blend-mode:screen;
+  background:radial-gradient(40% 30% at 20% 22%,rgba(255,255,255,.6),transparent 60%),
+             radial-gradient(35% 25% at 62% 16%,rgba(255,255,255,.4),transparent 60%),
+             radial-gradient(30% 22% at 88% 28%,rgba(255,255,255,.35),transparent 60%);
+  background-size:200% 100%;animation:cloudDrift 45s linear infinite}
+@keyframes cloudDrift{0%{background-position:0% 0}100%{background-position:100% 0}}
+.hero .scrim{position:absolute;inset:0;z-index:1;
+  background:
+    linear-gradient(180deg,rgba(20,30,36,.4) 0%,rgba(20,30,36,.08) 26%,transparent 44%,rgba(16,24,30,.78) 100%),
+    radial-gradient(130% 95% at 8% 108%,rgba(14,22,28,.72) 0%,transparent 52%)}
+.hero .inner{position:absolute;z-index:3;left:0;right:0;bottom:0;padding:0 var(--pad) clamp(48px,8vh,96px);
+  max-width:var(--maxw);margin:0 auto}
+.hero h1{color:#fff;font-size:clamp(38px,7vw,88px);font-weight:700;line-height:1;letter-spacing:-.035em;max-width:16ch}
+.hero p.sub{color:rgba(255,255,255,.86);margin-top:22px;max-width:44ch;font-size:clamp(16px,1.4vw,19px)}
+.hero .hero-cta{margin-top:34px;display:flex;gap:14px;flex-wrap:wrap}
+
+/* ===== INTRO / EINSPIELER ===== */
+/* Preloader: brand-coloured field with the long wordmark that contracts to the RAIL TOURS logo,
+   while the hero visual zooms up from a rounded inset to full-bleed. */
+.preloader{position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;
+  pointer-events:none;background:#20303a}
+.pl-word{display:flex;align-items:baseline;white-space:nowrap;overflow:hidden;
+  color:#fff;font-weight:800;letter-spacing:-.03em;font-size:clamp(24px,4.4vw,54px);
+  transform:translateY(0) scale(1);opacity:1;
+  transition:opacity .7s var(--ease-out),transform .9s var(--ease-out)}
+.pl-word .pl-dot{color:var(--accent)}
+.pl-tail{display:inline-block;max-width:60vw;opacity:.55;font-weight:600;letter-spacing:.02em;
+  font-size:.42em;margin-left:.7em;transform:translateX(0);
+  transition:max-width .8s var(--ease-out),opacity .55s var(--ease-out),margin-left .8s var(--ease-out)}
+/* Step classes are additive and never removed, so these states persist even after .is-intro is dropped. */
+/* Step 1 — contract: the descriptive tail collapses away, leaving just RAIL TOURS. */
+.pl-contract .pl-tail{max-width:0;opacity:0;margin-left:0}
+/* Step 2 — the preloader field fades as the hero zoom takes over. */
+.pl-out .preloader{opacity:0;transition:opacity .7s var(--ease-out)}
+.pl-out .pl-word{opacity:0;transform:translateY(-8px) scale(.94)}
+/* Hero zoom: during the intro the stage sits as a rounded inset, then expands to fill. */
+.is-intro .hero .hero-stage{transform:scale(.66);border-radius:38px}
+.pl-zoom .hero .hero-stage{transform:scale(1);border-radius:0;
+  transition:transform 1.25s var(--ease-out),border-radius 1.25s var(--ease-out)}
+/* Hero copy + header held back until the zoom lands. */
+.is-intro .hero .inner{opacity:0;transform:translateY(18px)}
+.is-intro #hdr{opacity:0;transform:translateY(-100%)}
+.hero .inner{transition:opacity .8s var(--ease-out),transform .8s var(--ease-out)}
+/* lock the page while the intro plays */
+.is-intro{overflow:hidden;height:100vh}
+@media(prefers-reduced-motion:reduce){
+  .preloader{display:none}
+  .is-intro .hero .hero-stage{transform:none;border-radius:0}
+  .is-intro .hero .inner,.is-intro #hdr{opacity:1;transform:none}
+  .is-intro{overflow:visible;height:auto}
+}
+
+/* ===== SCROLL-SHRINK FILM ===== */
+/* .filmwrap = scroll runway; .film = sticky viewport; .film-inner scales from full-bleed to a framed inline card */
+.filmwrap{position:relative;height:230vh;background:var(--paper)}
+.film{position:sticky;top:0;height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.film-inner{position:relative;width:100vw;height:100vh;overflow:hidden;
+  transform-origin:50% 50%;will-change:transform;backface-visibility:hidden;
+  transform:scale(1);border-radius:0;box-shadow:0 0 0 rgba(0,0,0,0)}
+.film-inner .filmvid{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.film-scrim{position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,rgba(16,24,30,.28) 0%,transparent 30%,transparent 62%,rgba(16,24,30,.55) 100%)}
+.film-cap{position:absolute;left:0;right:0;bottom:0;padding:clamp(28px,5vw,64px);color:#fff;
+  max-width:var(--maxw);margin:0 auto}
+.film-cap .eyebrow{color:rgba(255,255,255,.85)}
+.film-cap p{font-size:clamp(20px,3vw,40px);font-weight:700;line-height:1.08;letter-spacing:-.02em;max-width:20ch;margin-top:10px;
+  text-shadow:0 1px 18px rgba(12,18,24,.4)}
+@media(prefers-reduced-motion:reduce){
+  .filmwrap{height:auto}
+  .film{position:relative;height:auto;padding:0 var(--pad)}
+  .film-inner{width:100%;height:clamp(320px,64vh,640px);border-radius:24px;transform:none;margin:40px 0}
+}
+@media(max-width:640px){
+  .filmwrap{height:180vh}
+  .film-cap p{font-size:20px}
+}
+
+/* cookie bar */
+.cookie{position:fixed;bottom:0;left:0;right:0;z-index:120;background:var(--ink);color:#fff;
+  display:flex;align-items:center;justify-content:center;gap:20px;padding:12px 18px;font-size:13px;
+  transform:translateY(0);transition:transform .5s var(--ease)}
+.cookie.hide{transform:translateY(120%)}
+.cookie button{background:none;border:none;color:#fff;cursor:pointer;font-size:16px;line-height:1;opacity:.7}
+.cookie .accept{border:1px solid rgba(255,255,255,.4);border-radius:100px;padding:6px 16px;font-size:12.5px}
+
+/* ---------- intro statement ---------- */
+.intro{display:grid;grid-template-columns:1.5fr .9fr;gap:60px;align-items:start}
+.intro .statement{font-size:clamp(24px,3.4vw,44px);font-weight:600;line-height:1.16;letter-spacing:-.025em;color:var(--ink)}
+.intro .statement em{font-style:normal;color:var(--accent-deep)}
+.intro .side{color:var(--text);font-size:15.5px;line-height:1.8}
+.intro .side p+p{margin-top:18px}
+
+/* ---------- KPI strip ---------- */
+.kpis{display:grid;grid-template-columns:repeat(4,1fr)}
+.kpi{padding:8px 26px;border-left:1px solid var(--line)}
+.kpi:first-child{border-left:none;padding-left:0}
+.kpi .label{font-size:13px;color:var(--muted);margin-bottom:14px}
+.kpi .num{font-size:clamp(34px,4.6vw,60px);font-weight:700;letter-spacing:-.03em;line-height:1}
+.kpi .num .u{color:var(--accent-deep)}
+
+/* ---------- two-col feature ---------- */
+.feat{display:grid;grid-template-columns:1fr 1fr;gap:clamp(30px,5vw,80px);align-items:center}
+.feat.rev .txt{order:2}
+.feat .ph-lg{aspect-ratio:4/3}
+.feat .txt h2{margin-bottom:22px}
+.feat .txt .lead{margin-bottom:26px}
+
+/* sticky pin column */
+.pinwrap{display:grid;grid-template-columns:.85fr 1.15fr;gap:clamp(30px,5vw,80px);align-items:start}
+.pinwrap .stick{position:sticky;top:120px}
+.pinwrap .stick .eyebrow{margin-bottom:18px}
+.svc{border-top:1px solid var(--line);padding:30px 0;display:grid;grid-template-columns:auto 1fr;gap:28px}
+.svc:last-child{border-bottom:1px solid var(--line)}
+.svc .no{font-size:14px;color:var(--accent-deep);font-weight:700;letter-spacing:.1em;padding-top:6px}
+.svc h3{margin-bottom:10px}
+.svc p{color:var(--text);font-size:15px}
+.pinwrap .media-col .photo{aspect-ratio:3/4}
+
+/* ---------- brand feature (centered, flanked) ---------- */
+.brandf{display:grid;grid-template-columns:1fr 1.3fr 1fr;gap:34px;align-items:center}
+.brandf .photo{aspect-ratio:3/4}
+.brandf .mid{text-align:center;padding:20px}
+.brandf .mid h2{margin:18px 0 20px}
+.brandf .mid p{color:var(--text);max-width:40ch;margin:0 auto 26px}
+
+/* ---------- portfolio grid ---------- */
+.pf-head{display:flex;justify-content:space-between;align-items:flex-end;gap:30px;margin-bottom:48px;flex-wrap:wrap}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:26px 22px}
+.card .photo{aspect-ratio:4/5;margin-bottom:14px}
+.card .cap{font-size:15px;font-weight:600}
+.card .meta{font-size:13px;color:var(--muted);margin-top:3px}
+
+/* ---------- case study ---------- */
+.case{display:grid;grid-template-columns:.8fr 1.2fr;gap:clamp(30px,5vw,70px);align-items:center}
+.case .txt .small{margin:22px 0 30px}
+.case .ph-wrap{position:relative}
+.case .photo{aspect-ratio:16/11}
+.case .badge{position:absolute;right:16px;bottom:16px;z-index:5;background:rgba(255,255,255,.92);
+  border-radius:100px;padding:8px 16px;font-size:13px;font-weight:600;color:var(--ink)}
+.case .arrows{display:flex;gap:10px;margin-top:22px}
+.case .arrows button{width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--paper-2);
+  cursor:pointer;display:grid;place-items:center;transition:background .3s var(--ease),color .3s var(--ease),border-color .3s}
+.case .arrows button:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
+.case .arrows svg{width:16px;height:16px}
+
+/* ---------- interior panel ---------- */
+.panel{position:relative;height:78vh;min-height:520px;overflow:hidden;border-radius:0}
+.panel .bg{position:absolute;inset:-10% 0 0 0;will-change:transform;
+  background-image:url(assets/panel.jpg);background-size:cover;background-position:center}
+.panel .scrim{position:absolute;inset:0;background:linear-gradient(90deg,rgba(24,32,38,.6),rgba(24,32,38,.15) 50%,transparent 78%),linear-gradient(0deg,rgba(24,32,38,.35),transparent 40%)}
+.panel .inner{position:absolute;z-index:2;bottom:0;left:0;right:0;padding:0 var(--pad) clamp(40px,7vh,80px);
+  max-width:var(--maxw);margin:0 auto}
+.panel h2{color:#fff;max-width:14ch}
+.panel p{color:rgba(255,255,255,.85);max-width:40ch;margin-top:18px}
+
+/* ---------- news ---------- */
+.news-head{display:grid;grid-template-columns:.7fr 1.3fr;gap:40px;margin-bottom:46px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:30px}
+.ncard .photo{aspect-ratio:16/11;margin-bottom:20px}
+.ncard .src{font-size:13px;color:var(--muted);margin-bottom:10px}
+.ncard h4{font-size:19px;font-weight:600;line-height:1.28;letter-spacing:-.01em;margin-bottom:18px}
+
+/* ---------- footer ---------- */
+footer{background:var(--footer);color:#fff;border-radius:36px 36px 0 0;margin-top:60px;
+  padding:clamp(50px,7vw,84px) 0 40px;position:relative;overflow:hidden}
+.f-grid{display:grid;grid-template-columns:1.4fr .8fr .8fr auto;gap:40px;align-items:start}
+.f-logo{font-size:28px;font-weight:800;letter-spacing:-.02em}
+.f-logo .dot{color:var(--accent)}
+footer .desc{color:rgba(255,255,255,.7);font-size:14px;margin-top:22px;max-width:26ch;line-height:1.6}
+footer .addr{color:rgba(255,255,255,.7);font-size:14px;margin-top:26px;line-height:1.6}
+.f-col h5{font-size:14px;color:rgba(255,255,255,.5);font-weight:500;margin-bottom:18px}
+.f-col a{display:block;color:rgba(255,255,255,.9);font-size:15px;margin-bottom:14px;width:fit-content}
+.f-phone{font-size:clamp(24px,2.4vw,34px);font-weight:600;letter-spacing:-.02em}
+.contact-card{background:var(--footer-soft);border:1px solid rgba(255,255,255,.14);border-radius:36px;
+  padding:clamp(30px,3.5vw,48px);margin-top:60px;max-width:620px;margin-left:auto}
+.contact-card h3{font-size:clamp(24px,2.6vw,32px);font-weight:600;letter-spacing:-.02em;color:#fff}
+.contact-card p{color:rgba(255,255,255,.72);font-size:14.5px;margin:16px 0 30px;max-width:46ch}
+.field{margin-bottom:26px}
+.field input,.field textarea{width:100%;background:transparent;border:none;border-bottom:1px solid rgba(255,255,255,.25);
+  color:#fff;font-family:inherit;font-size:15px;padding:8px 0;outline:none;transition:border-color .3s var(--ease)}
+.field textarea{resize:none;min-height:40px}
+.field input::placeholder,.field textarea::placeholder{color:rgba(255,255,255,.5)}
+.field input:focus,.field textarea:focus{border-color:var(--accent)}
+.f-bottom{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;
+  margin-top:56px;padding-top:26px;border-top:1px solid rgba(255,255,255,.12);
+  color:rgba(255,255,255,.55);font-size:13px}
+
+/* ---------- responsive ---------- */
+@media(max-width:1024px){
+  .intro,.feat,.pinwrap,.case,.news-head{grid-template-columns:1fr;gap:40px}
+  .feat.rev .txt{order:0}
+  .pinwrap .stick{position:static}
+  .brandf{grid-template-columns:1fr;gap:24px}
+  .brandf .photo{aspect-ratio:16/9}
+  .grid4{grid-template-columns:repeat(2,1fr)}
+  .grid3{grid-template-columns:1fr}
+  .f-grid{grid-template-columns:1fr 1fr;gap:34px}
+  .contact-card{margin-left:0}
+  nav.top a:not(.nav-cta){display:none}
+}
+@media(max-width:560px){
+  .kpis{grid-template-columns:1fr 1fr;gap:28px 0}
+  .kpi{border-left:none;padding-left:0}
+  .kpi:nth-child(even){border-left:1px solid var(--line);padding-left:26px}
+  .grid4{grid-template-columns:1fr}
+  .f-grid{grid-template-columns:1fr}
+}
+@media(prefers-reduced-motion:reduce){
+  *{animation:none !important}
+  .rv,.wipe,.words span{opacity:1 !important;transform:none !important;clip-path:none !important;transition:none !important}
+  .hero .bg,.panel .bg,.hero .subject{transform:none !important}
+}
+</style>
+</head>
+<body class="is-intro">
+<div class="preloader" id="preloader" aria-hidden="true">
+  <div class="pl-word"><span class="pl-lead">RAIL&nbsp;TOURS</span><span class="pl-dot">.</span><span class="pl-tail">Europäische&nbsp;Bahnreisen</span></div>
+</div>
+<div id="progress"></div>
+
+<header id="hdr">
+  <div class="bar">
+    <a href="#" class="logo" aria-label="Rail Tours">
+      <svg class="mark" viewBox="0 0 24 24" fill="none"><path d="M4 20c3-3 5-8 8-8s5 5 8 8" stroke="#7FB0CE" stroke-width="2" stroke-linecap="round"/><rect x="8" y="4" width="8" height="9" rx="3" fill="#fff"/><circle cx="10" cy="15" r="1.4" fill="#7FB0CE"/><circle cx="14" cy="15" r="1.4" fill="#7FB0CE"/></svg>
+      RAIL TOURS<span class="dot">.</span>
+    </a>
+    <nav class="top">
+      <a href="#reisewelten" class="ul">Reisewelten</a>
+      <a href="#strecken" class="ul">Strecken</a>
+      <a href="#ueber" class="ul">Über uns</a>
+      <a href="#kontakt" class="nav-cta">Reise anfragen</a>
+    </nav>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero" id="top">
+  <div class="hero-stage">
+    <!-- Hero-Video: echte alpine Zugfahrt; Bild-Ken-Burns liegt als Fallback dahinter -->
+    <video class="bgvid" autoplay muted loop playsinline poster="assets/hero-bg.jpg" onerror="this.remove()">
+      <source src="assets/journey.mp4" type="video/mp4">
+    </video>
+    <div class="bg" data-parallax="0.14"><div class="kb"></div></div>
+    <div class="clouds"></div>
+    <div class="scrim"></div>
+  </div>
+  <div class="inner">
+    <h1 class="wipe">Bewegt von Fernweh.<br>Getragen von Schienen.</h1>
+    <p class="sub rv">Kuratierte Bahnreisen durch Europas schönste Landschaften — von der ersten Skizze bis zur letzten Weiche persönlich begleitet.</p>
+    <div class="hero-cta rv rv-d1">
+      <a href="#strecken" class="btn btn-light">Strecken entdecken
+        <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      <a href="#kontakt" class="btn" style="background:transparent;color:#fff;border-color:rgba(255,255,255,.5)">Reise planen</a>
+    </div>
+  </div>
+</section>
+
+<!-- SCROLL-SHRINK FILM: läuft voll­flächig weiter und zieht sich beim Scrollen in eine gerahmte Inline-Karte zusammen -->
+<section class="filmwrap" id="film">
+  <div class="film">
+    <div class="film-inner">
+      <video class="filmvid" autoplay muted loop playsinline preload="auto" poster="assets/glacier.jpg">
+        <source src="assets/journey.mp4" type="video/mp4">
+      </video>
+      <div class="film-scrim"></div>
+      <div class="film-cap">
+        <span class="eyebrow">Unterwegs</span>
+        <p>Jede Strecke ein Film — vom ersten Tunnel bis zum letzten Viadukt.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="cookie" id="cookie">
+  <span>Wir nutzen Cookies, um Ihr Reiseerlebnis zu verbessern. Mit der Nutzung stimmen Sie zu.</span>
+  <button class="accept" onclick="document.getElementById('cookie').classList.add('hide')">Akzeptieren</button>
+  <button onclick="document.getElementById('cookie').classList.add('hide')" aria-label="Schließen">✕</button>
+</div>
+
+<!-- INTRO STATEMENT -->
+<section class="pad-xl" id="ueber">
+  <div class="wrap">
+    <div class="intro">
+      <p class="statement words">RAIL TOURS ist ein Full-Service-Bahnreiseveranstalter, der Menschen und Landschaften auf <em>außergewöhnliche Weise</em> verbindet.</p>
+      <div class="side rv">
+        <p>Seit vier Jahrzehnten kuratieren wir Reisen entlang der schönsten Strecken Europas — von alpinen Panoramarouten bis zu historischen Luxuszügen.</p>
+        <p>Im Zentrum steht die <strong>PANORAMA</strong>-Kollektion: sorgfältig komponierte Reisen mit dem klaren Anspruch, Fortbewegung zum Erlebnis zu machen.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- KPI STRIP -->
+<section class="pad-l tint-sky">
+  <div class="wrap">
+    <div class="kpis">
+      <div class="kpi rv"><div class="label">Jahre Reiseerfahrung</div><div class="num"><span class="count" data-to="40">0</span><span class="u">+</span></div></div>
+      <div class="kpi rv rv-d1"><div class="label">Panoramarouten</div><div class="num"><span class="count" data-to="120">0</span><span class="u">+</span></div></div>
+      <div class="kpi rv rv-d2"><div class="label">Länder in Europa</div><div class="num"><span class="count" data-to="30">0</span><span class="u">+</span></div></div>
+      <div class="kpi rv rv-d3"><div class="label">Gäste jährlich</div><div class="num"><span class="count" data-to="50">0</span><span class="u">k+</span></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- HUMAN FOCUS FEATURE -->
+<section class="pad-xl">
+  <div class="wrap">
+    <div class="feat">
+      <div class="txt">
+        <h2 class="big wipe">Reisen mit Blick<br>fürs Wesentliche</h2>
+        <p class="lead rv">Persönliche Planung. Vom ersten Streckenvorschlag bis zur Ankunft begleiten wir jede Reise mit dem Anspruch, den Weg selbst zum Ziel zu machen — durchdacht, entschleunigt, mit Sinn fürs Detail.</p>
+        <a href="#reisewelten" class="btn btn-ghost">Unser Ansatz
+          <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      </div>
+      <div class="photo real zoomph ph-lg rv rv-d1"><div class="media" style="background-image:url(assets/feature.jpg)"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- REISEWELTEN (capabilities) — sticky pin -->
+<section class="pad-xl tint-sage" id="reisewelten">
+  <div class="wrap">
+    <div class="center rv" style="margin-bottom:64px">
+      <div class="eyebrow" style="margin-bottom:14px">Reisewelten</div>
+      <h2 class="big" style="max-width:16ch;margin-inline:auto">Vier Wege, die Welt langsamer zu sehen</h2>
+    </div>
+    <div class="pinwrap">
+      <div class="stick">
+        <div class="eyebrow">Kollektion</div>
+        <h3 class="mid rv" style="margin-bottom:18px">Jede Reise ein eigenes Tempo.</h3>
+        <p class="small rv rv-d1">Von der Weiche bis zum Willkommensglas — vier klar komponierte Reisewelten für jeden Anlass.</p>
+      </div>
+      <div class="media-col">
+        <div class="photo real zoomph rv" style="margin-bottom:34px"><div class="media" style="background-image:url(assets/reisewelten.jpg)"></div></div>
+        <div class="svc rv"><div class="no">01</div><div><h3 class="mid">Panoramarouten</h3><p>Gläserne Aussichtswagen durch Alpen, Fjorde und Küsten — Landschaft in Kinoformat.</p></div></div>
+        <div class="svc rv"><div class="no">02</div><div><h3 class="mid">Städtereisen</h3><p>Metropolen ohne Umsteigestress: entspannt an, mittendrin, direkt ins Erlebnis.</p></div></div>
+        <div class="svc rv"><div class="no">03</div><div><h3 class="mid">Luxuszüge</h3><p>Historische Waggons, Bordküche, Salon — Reisen im Stil einer anderen Zeit.</p></div></div>
+        <div class="svc rv"><div class="no">04</div><div><h3 class="mid">Rundreisen</h3><p>Mehrere Länder, eine Fahrkarte, ein roter Faden — kuratiert von Anfang bis Ende.</p></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BRAND FEATURE -->
+<section class="pad-xl">
+  <div class="wrap">
+    <div class="brandf">
+      <div class="photo real zoomph rv"><div class="media" style="background-image:url(assets/brand-a.jpg)"></div></div>
+      <div class="mid">
+        <div class="eyebrow">Signature</div>
+        <h2 class="big wipe">Die PANORAMA-Kollektion</h2>
+        <p class="rv rv-d1">Unsere Herzstück-Reisen: sorgfältig komponierte Strecken mit Aussichtswagen, Bordbegleitung und ausgewählten Aufenthalten — die spürbare Handschrift von RAIL TOURS auf Schienen.</p>
+        <a href="#strecken" class="arrowlink rv rv-d2"><span>Kollektion ansehen</span>
+          <span class="circ"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+      </div>
+      <div class="photo real zoomph rv rv-d1"><div class="media" style="background-image:url(assets/brand-b.jpg)"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- STRECKEN / PORTFOLIO -->
+<section class="pad-xl tint-blush" id="strecken">
+  <div class="wrap">
+    <div class="pf-head">
+      <div class="rv">
+        <div class="eyebrow" style="margin-bottom:14px">Strecken</div>
+        <h2 class="big">Unsere Reiserouten</h2>
+      </div>
+      <p class="small rv rv-d1" style="max-width:34ch">Eine Auswahl der schönsten Bahnstrecken Europas — jede von unseren Reiseexpert:innen persönlich befahren.</p>
+    </div>
+    <div class="grid4" id="pfGrid">
+      <a class="card rv"><div class="photo real"><div class="media" style="background-image:url(assets/glacier.jpg)"></div></div><div class="cap">Glacier Express</div><div class="meta">Zermatt · St. Moritz</div></a>
+      <a class="card rv rv-d1"><div class="photo real"><div class="media" style="background-image:url(assets/bernina.jpg)"></div></div><div class="cap">Bernina Express</div><div class="meta">Chur · Tirano</div></a>
+      <a class="card rv rv-d2"><div class="photo real"><div class="media" style="background-image:url(assets/flam-card.jpg)"></div></div><div class="cap">Flåmbahn</div><div class="meta">Myrdal · Flåm</div></a>
+      <a class="card rv rv-d3"><div class="photo real"><div class="media" style="background-image:url(assets/semmering.jpg)"></div></div><div class="cap">Semmeringbahn</div><div class="meta">Gloggnitz · Mürzzuschlag</div></a>
+      <a class="card rv"><div class="photo real"><div class="media" style="background-image:url(assets/rhaetian.jpg)"></div></div><div class="cap">Rhätische Bahn</div><div class="meta">Graubünden</div></a>
+      <a class="card rv rv-d1"><div class="photo real"><div class="media" style="background-image:url(assets/bergen.jpg)"></div></div><div class="cap">Bergensbanen</div><div class="meta">Oslo · Bergen</div></a>
+      <a class="card rv rv-d2"><div class="photo real"><div class="media" style="background-image:url(assets/centovalli-card.jpg)"></div></div><div class="cap">Centovalli-Bahn</div><div class="meta">Locarno · Domodossola</div></a>
+      <a class="card rv rv-d3"><div class="photo real"><div class="media" style="background-image:url(assets/goldenpass.jpg)"></div></div><div class="cap">GoldenPass Line</div><div class="meta">Montreux · Interlaken</div></a>
+    </div>
+  </div>
+</section>
+
+<!-- CASE STUDY -->
+<section class="pad-xl">
+  <div class="wrap">
+    <div class="case">
+      <div class="txt">
+        <div class="eyebrow rv" style="margin-bottom:14px">Reise im Fokus</div>
+        <h2 class="big wipe">Glacier Express</h2>
+        <p class="small rv rv-d1">Acht Stunden, 291 Brücken, 91 Tunnel und der Oberalppass auf 2.033 Metern: die legendärste Panoramastrecke der Alpen — von uns als Fünf-Tage-Reise mit Halten in Zermatt, Andermatt und St. Moritz komponiert.</p>
+        <a href="#kontakt" class="btn btn-ghost rv rv-d2">Diese Reise anfragen
+          <svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        <div class="arrows rv rv-d2">
+          <button aria-label="Zurück"><svg viewBox="0 0 24 24" fill="none"><path d="M19 12H5M11 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+          <button aria-label="Weiter"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        </div>
+      </div>
+      <div class="ph-wrap rv rv-d1">
+        <div class="photo real zoomph"><div class="media" style="background-image:url(assets/case.jpg)"></div></div>
+        <span class="badge">Zermatt · St. Moritz</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- INTERIOR PANEL -->
+<section class="panel">
+  <div class="bg" data-parallax="0.16"></div>
+  <div class="scrim"></div>
+  <div class="inner">
+    <h2 class="big wipe">Komfort in Bewegung</h2>
+    <p class="rv rv-d1">Panoramafenster, Bordküche und ein Platz, der Ihnen gehört — erleben Sie die Reise als eigenes Kapitel, nicht nur als Weg zum Ziel.</p>
+  </div>
+</section>
+
+<!-- NEWS -->
+<section class="pad-xl" id="aktuelles">
+  <div class="wrap">
+    <div class="news-head">
+      <div class="rv"><h2 class="big">Aktuelles</h2></div>
+      <p class="small rv rv-d1">Neue Strecken, saisonale Reisen und Geschichten aus dem Zug — kuratiert vom RAIL-TOURS-Team.</p>
+    </div>
+    <div class="grid3">
+      <article class="ncard rv">
+        <div class="photo real zoomph"><div class="media" style="background-image:url(assets/news1.jpg)"></div></div>
+        <div class="src">Reisemagazin:</div>
+        <h4>Neue Winterroute: Mit dem Bernina Express durch die verschneiten Alpen.</h4>
+        <a href="#" class="arrowlink"><span>Weiterlesen</span><span class="circ"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+      </article>
+      <article class="ncard rv rv-d1">
+        <div class="photo real zoomph"><div class="media" style="background-image:url(assets/news2.jpg)"></div></div>
+        <div class="src">RAIL TOURS Journal:</div>
+        <h4>PANORAMA-Kollektion 2027 vorgestellt — sechs neue kuratierte Reisen.</h4>
+        <a href="#" class="arrowlink"><span>Weiterlesen</span><span class="circ"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+      </article>
+      <article class="ncard rv rv-d2">
+        <div class="photo real zoomph"><div class="media" style="background-image:url(assets/news3.jpg)"></div></div>
+        <div class="src">Bahnwelt:</div>
+        <h4>Flåmbahn erhält Auszeichnung als schönste Bahnstrecke Skandinaviens.</h4>
+        <a href="#" class="arrowlink"><span>Weiterlesen</span><span class="circ"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12h14M13 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer id="kontakt">
+  <div class="wrap">
+    <div class="f-grid">
+      <div>
+        <div class="f-logo">RAIL TOURS<span class="dot">.</span></div>
+        <p class="desc">RAIL TOURS ist ein kuratierter Bahnreiseveranstalter für Europas schönste Strecken.</p>
+        <p class="addr">Bahnhofstraße 12 — 3. OG<br>48143 Münster<br><br>reisen@rail-tours.eu</p>
+      </div>
+      <div class="f-col">
+        <h5>Menü</h5>
+        <a href="#top" class="ul">Start</a>
+        <a href="#ueber" class="ul">Über uns</a>
+        <a href="#reisewelten" class="ul">Reisewelten</a>
+        <a href="#strecken" class="ul">Strecken</a>
+      </div>
+      <div class="f-col">
+        <h5>Social</h5>
+        <a href="#" class="ul">Instagram</a>
+        <a href="#" class="ul">LinkedIn</a>
+        <a href="#" class="ul">Newsletter</a>
+      </div>
+      <div class="f-phone">+49 251 469 2900</div>
+    </div>
+
+    <div class="contact-card">
+      <h3>Lassen Sie uns Ihre Reise planen</h3>
+      <p>Erzählen Sie uns von Ihrer Wunschstrecke — wir melden uns mit einem persönlichen Reisevorschlag.</p>
+      <form onsubmit="event.preventDefault();this.querySelector('.btn').textContent='Danke — wir melden uns!';">
+        <div class="field"><input type="text" placeholder="Vorname" required></div>
+        <div class="field"><input type="text" placeholder="Nachname" required></div>
+        <div class="field"><input type="email" placeholder="E-Mail-Adresse" required></div>
+        <div class="field"><textarea placeholder="Ihre Wunschreise" rows="2"></textarea></div>
+        <button class="btn btn-light" type="submit">Reise anfragen
+          <svg viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      </form>
+    </div>
+
+    <div class="f-bottom">
+      <span>© 2026 RAIL TOURS. Alle Rechte vorbehalten.</span>
+      <span>Impressum · Datenschutz · AGB</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ===== INTRO / EINSPIELER timeline =====
+     preloader wordmark contracts -> hero stage zooms from rounded inset to full -> copy reveals */
+  (function intro(){
+    var body = document.body;
+    var pl = document.getElementById('preloader');
+    if(reduce){
+      body.classList.remove('is-intro');
+      if(pl) pl.remove();
+      return;
+    }
+    window.scrollTo(0,0);
+    // t0: hold on the long wordmark, then contract to the logo
+    setTimeout(function(){ body.classList.add('pl-contract'); }, 950);
+    // start the hero zoom (1.25s) while the field fades out
+    setTimeout(function(){ body.classList.add('pl-zoom','pl-out'); }, 1650);
+    // land (after the zoom completes ~2900ms): reveal copy + header, unlock scroll
+    setTimeout(function(){
+      body.classList.remove('is-intro');
+      // reveal the hero headline/sub/cta as part of the landing (avoids observer race)
+      document.querySelectorAll('.hero .inner .wipe,.hero .inner .rv').forEach(function(el){ el.classList.add('in'); });
+      window.dispatchEvent(new Event('scroll'));
+    }, 2950);
+    setTimeout(function(){ if(pl) pl.remove(); }, 3600);
+  })();
+
+  /* sticky header solid on scroll */
+  var hdr = document.getElementById('hdr');
+  function onScrollHdr(){ hdr.classList.toggle('solid', window.scrollY > window.innerHeight*0.7); }
+
+  /* split statement into words */
+  document.querySelectorAll('.words').forEach(function(el){
+    var frag = [];
+    el.childNodes.forEach ? null : 0;
+    var nodes = Array.prototype.slice.call(el.childNodes);
+    el.innerHTML='';
+    nodes.forEach(function(n){
+      if(n.nodeType===3){
+        n.textContent.split(/(\s+)/).forEach(function(w){
+          if(w.trim()===''){ el.appendChild(document.createTextNode(w)); }
+          else{ var s=document.createElement('span'); s.textContent=w; el.appendChild(s); }
+        });
+      } else {
+        // keep inline element (em) but wrap its text words
+        var tag=n.cloneNode(false);
+        var s=document.createElement('span'); s.textContent=n.textContent; tag.appendChild(s);
+        el.appendChild(tag);
+      }
+    });
+    // stagger
+    el.querySelectorAll('span').forEach(function(s,i){ s.style.transitionDelay=(i*0.045)+'s'; });
+  });
+
+  /* reveal observer */
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){ if(e.isIntersecting){ e.target.classList.add('in'); io.unobserve(e.target); } });
+  },{threshold:0.16, rootMargin:'0px 0px -8% 0px'});
+  document.querySelectorAll('.rv,.wipe,.words').forEach(function(el){ io.observe(el); });
+
+  /* count-up */
+  function countUp(el){
+    var to=+el.dataset.to, dur=1400, start=null;
+    function step(ts){ if(!start)start=ts; var p=Math.min((ts-start)/dur,1);
+      el.textContent=Math.round((1-Math.pow(1-p,3))*to); if(p<1)requestAnimationFrame(step); }
+    requestAnimationFrame(step);
+  }
+  var cio=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){countUp(e.target);cio.unobserve(e.target);}});},{threshold:.6});
+  document.querySelectorAll('.count').forEach(function(el){ cio.observe(el); });
+
+  /* rAF scroll loop: progress bar + parallax + scroll-shrink film */
+  var prog=document.getElementById('progress');
+  var parallaxEls=[].slice.call(document.querySelectorAll('[data-parallax]'));
+  var filmWrap=document.querySelector('.filmwrap');
+  var filmInner=document.querySelector('.film-inner');
+  var SHRINK_TO=0.60, SHRINK_END=0.55; /* scale target + fraction of runway used to shrink */
+  var ticking=false;
+  function frame(){
+    var y=window.scrollY, h=document.documentElement.scrollHeight-innerHeight;
+    prog.style.width=(h>0?(y/h*100):0)+'%';
+    if(!reduce){
+      parallaxEls.forEach(function(el){
+        var sp=+el.dataset.parallax, r=el.getBoundingClientRect();
+        var mid=r.top+r.height/2-innerHeight/2;
+        el.style.transform='translate3d(0,'+(-mid*sp)+'px,0)';
+      });
+      /* scroll-shrink: full-bleed video collapses into a framed inline card, then holds while it keeps playing */
+      if(filmWrap&&filmInner){
+        var wr=filmWrap.getBoundingClientRect();
+        var runway=wr.height-innerHeight;
+        var p=runway>0?Math.min(1,Math.max(0,-wr.top/runway)):0;
+        var s=Math.min(1,p/SHRINK_END);
+        s=1-Math.pow(1-s,2); /* ease-out */
+        var scale=1-s*(1-SHRINK_TO);
+        filmInner.style.transform='scale('+scale.toFixed(4)+')';
+        filmInner.style.borderRadius=(s*26).toFixed(1)+'px';
+        filmInner.style.boxShadow='0 '+(s*40).toFixed(0)+'px '+(s*90).toFixed(0)+'px rgba(20,30,40,'+(s*0.28).toFixed(3)+')';
+      }
+    }
+    onScrollHdr();
+    ticking=false;
+  }
+  addEventListener('scroll',function(){ if(!ticking){requestAnimationFrame(frame);ticking=true;} },{passive:true});
+  addEventListener('resize',frame); frame();
+})();
+</script>
+</body>
+</html>
