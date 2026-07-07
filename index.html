@@ -153,9 +153,11 @@ h3.mid{font-size:clamp(22px,2.6vw,34px);font-weight:600;line-height:1.12;letter-
 .words.in span{opacity:1;transform:none}
 
 /* ---------- HERO ---------- */
-/* .herowrap = scroll runway; .hero sticks while the video shrinks into a framed inline card */
-.herowrap{position:relative;height:200vh;background:#20303a}
-.hero{position:sticky;top:0;height:100vh;min-height:640px;overflow:hidden;background:#20303a}
+/* .herowrap = scroll runway; .hero sticks while the video shrinks into a framed inline card.
+   Backdrop matches the site paper tone so the shrunk card floats on the general page colour.
+   (During the intro it's overridden to the dark preloader tone below — see .is-intro rule.) */
+.herowrap{position:relative;height:200vh;background:var(--paper)}
+.hero{position:sticky;top:0;height:100vh;min-height:640px;overflow:hidden;background:var(--paper)}
 /* .hero-stage = the visual block that zooms from a rounded inset up to full-bleed during the intro */
 .hero .hero-stage{position:absolute;inset:0;z-index:0;overflow:hidden;transform-origin:50% 50%;
   will-change:transform;backface-visibility:hidden}
@@ -205,6 +207,9 @@ h3.mid{font-size:clamp(22px,2.6vw,34px);font-weight:600;line-height:1.12;letter-
 /* Step 2 — the preloader field fades as the hero zoom takes over. */
 .pl-out .preloader{opacity:0;transition:opacity .7s var(--ease-out)}
 .pl-out .pl-word{opacity:0;transform:translateY(-8px) scale(.94)}
+/* During the intro the backdrop stays the dark preloader tone so the rounded inset reads against it;
+   it flips to paper only once the video fills full-bleed (is-intro dropped) — an invisible switch. */
+.is-intro .herowrap,.is-intro .hero{background:#20303a}
 /* Hero zoom: during the intro the stage sits as a rounded inset, then expands to fill. */
 .is-intro .hero .hero-stage{transform:scale(.66);border-radius:38px}
 .pl-zoom .hero .hero-stage{transform:scale(1);border-radius:0;
